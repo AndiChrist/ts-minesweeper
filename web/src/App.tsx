@@ -44,7 +44,11 @@ export default function App() {
                         {row.map((cell, x) => (
                             <button
                                 key={x}
-                                className={`cell ${cell.isRevealed ? "revealed" : ""}`}
+                                className={`cell ${cell.isRevealed ? "revealed" : ""} ${
+                                    cell.isRevealed && cell.surroundingMines > 0
+                                        ? `cell-${cell.surroundingMines}`
+                                        : ""
+                                }`}
                                 onClick={() => handleLeftClick(x, y)}
                                 onContextMenu={(e) => handleRightClick(e, x, y)}
                             >
