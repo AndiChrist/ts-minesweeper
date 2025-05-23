@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings --loader ts-node/esm src/cli/index.ts"
+    "start": "node --no-warnings --loader ts-node/esm src/cli/index.ts",
+    "clean": "rm -rf node_modules"
   },
   "dependencies": {
     "prompt-sync": "^4.2.0"

@@ -1,55 +1,58 @@
+// src/cli/index.ts
 import promptSync from "prompt-sync";
-import { createBoard } from "../core/board.js";
-import { reveal, isGameWon } from "../core/game.js";
+import { Board } from "../core/Board.js";
 
-const prompt = promptSync();
-const rows = 8;
-const cols = 8;
+const prompt = promptSync({ sigint: true });
+
+const width = 10;
+const height = 10;
 const mines = 10;
 
-let board = createBoard(rows, cols, mines);
-let gameOver = false;
+const board = new Board(width, height, mines);
 
-function printBoard() {
-    console.log("   " + [...Array(cols).keys()].map(n => n.toString()).join(" "));
-    board.forEach((row, r) => {
-        const line = row
-            .map(cell => {
-                if (cell.isRevealed) {
-                    return cell.isMine ? "*" : cell.neighborMines.toString();
-                } else {
-                    return ".";
-                }
-            })
-            .join(" ");
-        console.log(`${r}  ${line}`);
-    });
-}
+console.log("🧨 Willkommen bei Minesweeper!");
+console.log("Befehle:");
+console.log("  r x y   → Feld aufdecken (reveal)");
+console.log("  f x y   → Flagge setzen/entfernen (flag)");
+console.log("  q       → Spiel beenden");
 
-while (!gameOver) {
-    printBoard();
-    const input = prompt("Zelle (Format: x y): ");
-    const [xStr, yStr] = input.trim().split(" ");
-    const x = parseInt(xStr);
-    const y = parseInt(yStr);
+while (!board.isGameOver) {
+    board.print();
 
-    if (isNaN(x) || isNaN(y) || x < 0 || y < 0 || x >= rows || y >= cols) {
-        console.log("Ungültige Eingabe.");
+    const input = prompt("> ");
+    if (!input) continue;
+
+    const [command, xs, ys] = input.trim().split(" ");
+    if (command === "q") {
+        console.log("👋 Spiel beendet.");
+        process.exit(0);
+    }
+
+    const x = parseInt(xs, 10);
+    const y = parseInt(ys, 10);
+    if (isNaN(x) || isNaN(y)) {
+        console.log("❌ Ungültige Koordinaten! Bitte ganze Zahlen eingeben.");
         continue;
     }
 
-    const cell = board[x][y];
-    if (cell.isMine) {
-        console.log("💥 BOOM! Du bist auf eine Mine getreten.");
-        gameOver = true;
-        cell.isRevealed = true;
-        printBoard();
-    } else {
-        reveal(board, x, y);
-        if (isGameWon(board)) {
-            console.log("🎉 Glückwunsch! Du hast gewonnen.");
-            gameOver = true;
-            printBoard();
+    if (command === "r") {
+        board.reveal(x, y);
+        if (board.isGameOver) {
+            console.log("💥 Boom! Du bist auf eine Mine getreten!");
+            board.print();
+            break;
         }
+    } else if (command === "f") {
+        board.toggleFlag(x, y);
+    } else {
+        console.log("❓ Unbekannter Befehl. Bitte 'r', 'f' oder 'q' verwenden.");
+    }
+
+    if (board.isWon()) {
+        console.log("🎉 Glückwunsch! Du hast alle sicheren Felder gefunden!");
+        board.print();
+        break;
     }
 }
+
+console.log("🏁 Spiel vorbei.");
