@@ -1,4 +1,5 @@
 import { Cell } from "./Cell.js";
+import chalk from "chalk";
 
 export class Board {
     grid: Cell[][];
@@ -91,10 +92,13 @@ export class Board {
         console.log("\n  " + [...Array(this.width).keys()].map(n => n.toString().padStart(2)).join(" "));
         this.grid.forEach((row, y) => {
             const line = row.map(cell => {
-                if (cell.isFlagged) return "⚑ ";
-                if (!cell.isRevealed) return "■ ";
-                if (cell.hasMine) return "💣";
-                return cell.surroundingMines > 0 ? `${cell.surroundingMines} ` : "  ";
+                if (cell.isFlagged) return chalk.yellow("⚑ ");
+                if (!cell.isRevealed) return chalk.gray("■ ");
+                if (cell.hasMine) return chalk.red("💣");
+                if (cell.surroundingMines > 0) {
+                    return chalk.cyan(`${cell.surroundingMines} `);
+                }
+                return "  ";
             }).join(" ");
             console.log(y.toString().padStart(2) + " " + line);
         });

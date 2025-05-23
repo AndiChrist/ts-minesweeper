@@ -1,4 +1,3 @@
-// src/cli/index.ts
 import promptSync from "prompt-sync";
 import { Board } from "../core/Board.js";
 
